@@ -1,0 +1,58 @@
+# Colocamos la versión de nuestro contenedor
+version: "3"
+# Colocamos nuestros contenedores en este
+# caso 2 uno para Grafana y otro para InfluxDB
+services:
+  grafana:
+  # La imagen de grafana
+    image: grafana/grafana
+    # Colocamos el nombre que le otorgaremos 
+    container_name: grafana
+    restart: always
+    # Este será el puerto de nuestro Grafana 
+    ports:
+      - 3000:3000
+      # Colocamos el nombre de nuestra red la cual usaremos para nuestro contenedor
+    networks:
+      - grafana_network
+      # Nombramos nuestro volumen, además de colocar la ruta para graficar los datos
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - influxdb
+    depends_on:
+      - NodeRed
+
+  influxdb:
+  # Colocamos la imagen de InfluxDB
+    image: influxdb:latest
+    # Nombramos nuestro contenedor 
+    container_name: influxdb
+    restart: always
+    # Colocamos el puerto de InfluxDB 
+    ports:
+      - 8086:8086
+    networks:
+      - grafana_network
+       # Nombramos nuestro volumen, además de colocar la ruta para graficar los datos
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+       # BD para nuestro contenedor 
+    environment:
+     # Nombre de la BD
+      - INFLUXDB_DB=grafana
+       # Usuario y contraseña
+      - INFLUXDB_USER=grafana
+      - INFLUXDB_USER_PASSWORD=password
+       # Habilitar cuenta de administrador de InfluxDB 
+      - INFLUXDB_ADMIN_ENABLED=true
+       # Usuario y Contraseña
+      - INFLUXDB_ADMIN_USER=admin 
+      - INFLUXDB_ADMIN_PASSWORD=password 
+networks:
+  grafana_network:
+volumes:
+  grafana_data:
+  influxdb_data:
+
+
